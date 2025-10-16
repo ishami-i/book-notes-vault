@@ -14,7 +14,8 @@ It stores your data locally (using `localStorage`), so your notes remain private
 
 ## 🖼️ Live Demo
 
-🚀 [**View on GitHub Pages**](https://ishami-i.github.io/book-notes-vault/) *(if deployed)*
+how to use repo after runing it on local is like this https://youtu.be/TxmEhCZrgUY
+
 
 ---
 
