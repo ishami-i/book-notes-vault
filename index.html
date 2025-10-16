@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book & Notes Vault — Student Project</title>
+  <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" role="banner">
+    <div class="brand">
+      <h1>📚 Book & Notes Vault</h1>
+      <p class="tagline">Catalog your books, pages & study notes</p>
+    </div>
+
+    <!-- Burger button (visible on small screens) -->
+    <button id="nav-toggle" class="nav-toggle" aria-controls="main-nav" aria-expanded="false" aria-label="Open main navigation">
+      <span class="hamburger" aria-hidden="true"></span>
+    </button>
+
+    <!-- Main navigation -->
+    <!-- Keep buttons to match your existing JS that queries ".main-nav button" -->
+    <nav id="main-nav" role="navigation" aria-label="Main navigation" class="main-nav" hidden>
+      <button data-nav="#about">About</button>
+      <button data-nav="#dashboard">Dashboard</button>
+      <button data-nav="#records">Records</button>
+      <button data-nav="#form">Add</button>
+      <button data-nav="#settings">Settings</button>
+    </nav>
+  </header>
+
+  <main id="main" role="main">
+    <!-- About -->
+    <section id="about" aria-labelledby="about-heading">
+      <h2 id="about-heading">About — Book & Notes Vault</h2>
+      <p>
+        <strong>Book & Notes Vault</strong><i> is a lightweight personal catalog designed
+        to help users store, organize, and track their reading and study
+        materials in one place. The app allows you to record book titles, page counts,
+        tags, and notes while providing smart search, filtering, and data summaries on your
+        dashboard.
+        It is built using vanilla HTML, CSS, and JavaScript, featuring localStorage data
+        persistence, regex-based input validation, and accessible keyboard navigation for inclusive use.
+      </i></p>
+      <h3>Developer</h3>
+      <ul class="contact">
+        <li><strong>Name:</strong> ISHAMI Irené</li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/ishami-i" target="_blank" rel="noopener">github.com/ishami-i</a></li>
+        <li><strong>Email:</strong> <a href="mailto:i.irene@alustudent.com">i.irene@alustudent.com</a></li>
+      </ul>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" aria-labelledby="dashboard-heading">
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Value / Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Total Books</td>
+            <td id="total-books" class="highlight">0</td>
+          </tr>
+          <tr>
+            <td>Total Pages</td>
+            <td id="total-pages" class="highlight">0</td>
+          </tr>
+          <tr>
+            <td>Top Tags</td>
+            <td>
+              <ul id="top-tags" class="inline-list">
+                <li>—</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>Reading Goal</td>
+            <td>
+              <span id="reading-goal">0 / 0 pages</span>
+              <p id="cap-message" class="cap-message" aria-live="polite"></p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mini-chart" aria-hidden="false" id="week-trend" title="Last 7 days pages trend"></div>
+
+    </section>
+
+    <!-- Records -->
+    <section id="records" aria-labelledby="records-heading">
+      <h2 id="records-heading">Records</h2>
+
+      <div class="controls">
+        <label for="regex-search">Live Regex Search</label>
+        <br><br>
+        <input id="regex-search" placeholder="Enter regex (try: /The/ or \b(\w+)\s+\1\b )" aria-describedby="search-help">
+        <br><br><br>
+        <small id="search-help">Toggle case-insensitive checkbox. Invalid regex won't crash the app.</small>
+        <br><br><br>
+        <label><input id="case-ins" type="checkbox"> Case-insensitive</label>
+        <br><br><br>
+        <label for="sort-by">Sort by</label>
+        <select id="sort-by" aria-label="Sort records">
+          <option value="date_desc">Date (new→old)</option>
+          <option value="date_asc">Date (old→new)</option>
+          <option value="title_asc">Title (A→Z)</option>
+          <option value="title_desc">Title (Z→A)</option>
+          <option value="pages_desc">Pages (high→low)</option>
+          <option value="pages_asc">Pages (low→high)</option>
+        </select>
+      </div>
+
+      <div class="table-wrap" role="region" aria-label="Records table">
+        <table id="records-table">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Author</th>
+              <th scope="col">Pages</th>
+              <th scope="col">Tag</th>
+              <th scope="col">Status</th>
+              <th scope="col">Date Added</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="records-body">
+            <tr><td colspan="7" class="empty">No records yet — add one.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Add / Edit Form -->
+    <section id="form" aria-labelledby="form-heading">
+      <h2 id="form-heading">Add / Edit Book</h2>
+      <form id="record-form" novalidate>
+        <input type="hidden" id="record-id" value="">
+        <div class="row">
+          <label for="title">Title</label>
+          <input id="title" name="title" type="text" required aria-describedby="title-hint">
+          <small id="title-hint">No leading/trailing spaces; double spaces collapsed.</small>
+        </div>
+
+        <div class="row">
+          <label for="author">Author</label>
+          <input id="author" name="author" type="text" aria-describedby="author-hint">
+          <small id="author-hint">Letters, spaces, hyphens allowed.</small>
+        </div>
+
+        <div class="row">
+          <label for="pages">Pages</label>
+          <input id="pages" name="pages" type="number" min="1" required>
+        </div>
+
+        <div class="row">
+          <label for="tag">Tag</label>
+          <input id="tag" name="tag" type="text" required>
+        </div>
+        <div class="row">
+          <label for="status">Status</label>
+          <select id="status" name="status" required>
+            <option value="unread">Unread</option>
+            <option value="reading">Reading</option>
+            <option value="done">Done Reading</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="dateAdded">Date Added</label>
+          <input id="dateAdded" name="dateAdded" type="date" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="save-btn">Save</button>
+          <button type="reset" id="reset-btn">Clear</button>
+        </div>
+
+        <div id="form-errors" role="status" aria-live="assertive"></div>
+      </form>
+    </section>
+
+    <!-- Settings -->
+    <section id="settings" aria-labelledby="settings-heading">
+      <h2 id="settings-heading">Settings</h2>
+
+      <form id="settings-form">
+        <div class="row">
+          <label for="goal">Reading goal (pages)</label>
+          <input id="goal" type="number" min="0">
+        </div>
+
+        <div class="row">
+          <label for="unit">Units</label>
+          <select id="unit">
+            <option value="pages">Pages</option>
+            <option value="hours">Hours</option>
+          </select>
+        </div>
+
+        <fieldset class="data-management">
+          <legend>Data</legend>
+          <button type="button" id="export-btn">Export JSON</button>
+          <button type="button" id="import-btn">Import JSON</button>
+          <input id="import-file" type="file" accept=".json" hidden>
+          <button type="button" id="seed-btn">Load Example Seed</button>
+          <button type="button" id="clear-btn">Clear All Data</button>
+        </fieldset>
+      </form>
+
+      <div id="status" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2025 Book & Notes Vault — Built by Irené Ishami<br>
+      My github account username: <a href="https://github.com/ishami-i" target="_blank">ishami-i</a>
+    </p>
+  </footer>
+
+  <script type="module" src="scripts/ui.js"></script>
+</body>
+</html>

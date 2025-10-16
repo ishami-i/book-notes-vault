@@ -1,0 +1,12 @@
+[
+  {"id":"rec_a1","title":"Deep Work","author":"Cal Newport","pages":304,"tag":"Productivity","status":"done","dateAdded":"2025-09-01","createdAt":"2025-09-01T08:00:00Z","updatedAt":"2025-09-01T08:00:00Z"},
+  {"id":"rec_a2","title":"Clean Code","author":"Robert C. Martin","pages":464,"tag":"Programming","status":"reading","dateAdded":"2025-09-03","createdAt":"2025-09-03T09:00:00Z","updatedAt":"2025-09-03T09:00:00Z"},
+  {"id":"rec_a3","title":"Introduction to Algorithms","author":"Cormen et al.","pages":1312,"tag":"Textbook","status":"unread","dateAdded":"2025-08-21","createdAt":"2025-08-21T10:00:00Z","updatedAt":"2025-08-21T10:00:00Z"},
+  {"id":"rec_a4","title":"The Pragmatic Programmer","author":"Hunt & Thomas","pages":352,"tag":"Programming","status":"reading","dateAdded":"2025-09-10","createdAt":"2025-09-10T11:00:00Z","updatedAt":"2025-09-10T11:00:00Z"},
+  {"id":"rec_a5","title":"The Readable City","author":"A. Author","pages":220,"tag":"Urbanism","status":"unread","dateAdded":"2025-09-28","createdAt":"2025-09-28T07:30:00Z","updatedAt":"2025-09-28T07:30:00Z"},
+  {"id":"rec_a6","title":"Notes on Thermodynamics","author":"M. Smith","pages":120,"tag":"Science","status":"done","dateAdded":"2025-10-01","createdAt":"2025-10-01T06:00:00Z","updatedAt":"2025-10-01T06:00:00Z"},
+  {"id":"rec_a7","title":"A Tale of Two Cities","author":"Charles Dickens","pages":544,"tag":"Novel","status":"reading","dateAdded":"2025-09-12","createdAt":"2025-09-12T08:00:00Z","updatedAt":"2025-09-12T08:00:00Z"},
+  {"id":"rec_a8","title":"Mathematics for Machine Learning","author":"M. Deisenroth","pages":400,"tag":"Textbook","status":"unread","dateAdded":"2025-09-22","createdAt":"2025-09-22T09:00:00Z","updatedAt":"2025-09-22T09:00:00Z"},
+  {"id":"rec_a9","title":"Study Notes — Linear Algebra","author":"I. Student","pages":45,"tag":"Notes","status":"done","dateAdded":"2025-10-09","createdAt":"2025-10-09T12:00:00Z","updatedAt":"2025-10-09T12:00:00Z"},
+  {"id":"rec_a10","title":"Coffee Coffee","author":"Repeat Author","pages":12,"tag":"Misc","status":"unread","dateAdded":"2025-10-10","createdAt":"2025-10-10T07:00:00Z","updatedAt":"2025-10-10T07:00:00Z"}
+]
