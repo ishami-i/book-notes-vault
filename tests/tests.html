@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Books & Notes Vault - Regex Test</title>
+    
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <main>
+        <h1>Books & Notes Vault - Regex Form</h1>
+        <p>
+            This form validates book records in real-time. You can normalize fields, run validation, or execute tests.
+        </p>
+
+        <form id="regex-testing" novalidate>
+            <div class="row">
+                <label for="title">Title</label>
+                <input id="title" name="title" type="text" placeholder="E.g. The Little Prince" autocomplete="off" />
+                <div class="hint">No leading/trailing spaces. Duplicate adjacent words are flagged.</div>
+              </div>
+          
+              <div class="two-cols">
+                <div class="row">
+                  <label for="author">Author</label>
+                  <input id="author" name="author" type="text" placeholder="E.g. Antoine de Saint-Exupéry" autocomplete="off"/>
+                  <div class="hint">Letters, spaces, hyphens allowed.</div>
+                </div>
+          
+                <div class="row">
+                  <label for="pages">Pages</label>
+                  <input id="pages" name="pages" type="number" min="1" placeholder="E.g. 96" />
+                  <div class="hint">Must be a positive integer.</div>
+                </div>
+              </div>
+          
+              <div class="two-cols">
+                <div class="row">
+                  <label for="tag">Tag</label>
+                  <input id="tag" name="tag" type="text" placeholder="E.g. Fiction" />
+                </div>
+          
+                <div class="row">
+                  <label for="status">Status</label>
+                  <select id="status" name="status">
+                    <option value="unread">Unread</option>
+                    <option value="reading">Reading</option>
+                    <option value="done">Done</option>
+                  </select>
+                </div>
+              </div>
+          
+              <div class="row">
+                <label for="dateAdded">Date Added</label>
+                <input id="dateAdded" name="dateAdded" type="date" />
+              </div>
+          
+              <div class="actions">
+                <button id="validate-btn" type="button">Validate</button>
+                <button id="normalize-btn" type="button">Normalize</button>
+                <button id="reset-btn" type="reset">Reset</button>
+                <button id="run-tests" type="button">Run Tests</button>
+              </div>
+          
+              <div id="status-badge"></div>
+              <div id="live-feedback" class="output"></div>
+              <div id="test-results"></div>
+        </form>
+    </main>
+
+    <!-- Main JS for form logic -->
+    <script type="module" src="./scripts.js"></script>
+</body>
+</html>

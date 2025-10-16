@@ -1,0 +1,39 @@
+body {
+    font-family: "Poppins", sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 2rem;
+    color: #333;
+  }
+  
+  main {
+    max-width: 800px;
+    margin: auto;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  }
+  
+  h1 { color: #2563eb; margin-bottom: 1rem; }
+  
+  form .row { display:flex; flex-direction:column; margin-bottom:1rem; }
+  form .two-cols { display:flex; gap:1rem; }
+  
+  input, select { padding:0.6rem; font-size:1rem; border:1px solid #ccc; border-radius:8px; }
+  button { padding:0.6rem 1rem; border:none; border-radius:8px; background:#2563eb; color:#fff; cursor:pointer; }
+  button:hover { background:#1e40af; }
+  
+  .field-error { border:2px solid #ef4444 !important; }
+  .field-success { border:2px solid #16a34a !important; }
+  
+  .badge { padding:0.2rem 0.6rem; border-radius:4px; font-weight:bold; }
+  .badge.ok { background:#16a34a; color:#fff; }
+  .badge.bad { background:#ef4444; color:#fff; }
+  
+  .card { padding:0.8rem; background:#f0f9ff; border-radius:8px; margin-top:8px; }
+  .errors ul { margin:0; padding-left:18px; }
+  .success { color:#16a34a; font-weight:bold; }
+  .hint { font-size:0.85rem; color:#6b7280; margin-top:2px; }
+  .actions { display:flex; gap:0.5rem; margin-top:1rem; }
+  
