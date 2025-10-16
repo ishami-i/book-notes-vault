@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Book & Notes Vault — Student Project</title>
-  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles/styles.css" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -83,6 +83,9 @@
             <td>
               <span id="reading-goal">0 / 0 pages</span>
               <p id="cap-message" class="cap-message" aria-live="polite"></p>
+              <div class="progress-wrap" aria-hidden="false">
+                <div id="reading-progress" class="reading-progress" role="presentation" aria-hidden="true" style="width:0%"></div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -98,13 +101,8 @@
 
       <div class="controls">
         <label for="regex-search">Live Regex Search</label>
-        <br><br>
         <input id="regex-search" placeholder="Enter regex (try: /The/ or \b(\w+)\s+\1\b )" aria-describedby="search-help">
-        <br><br><br>
-        <small id="search-help">Toggle case-insensitive checkbox. Invalid regex won't crash the app.</small>
-        <br><br><br>
         <label><input id="case-ins" type="checkbox"> Case-insensitive</label>
-        <br><br><br>
         <label for="sort-by">Sort by</label>
         <select id="sort-by" aria-label="Sort records">
           <option value="date_desc">Date (new→old)</option>
@@ -222,6 +220,6 @@
     </p>
   </footer>
 
-  <script type="module" src="scripts/ui.js"></script>
+  <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

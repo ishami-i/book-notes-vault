@@ -1,6 +1,4 @@
 // scripts/ui.js
-// Entry UI file: preserves your app logic and adds responsive nav (burger) behavior.
-// Note: this file expects modules like state.js, search.js, validators.js, storage.js to exist
 import { State } from "./state.js";
 import { compileRegex, highlightMatches, escapeHtml } from "./search.js";
 import { validateRecord, normalizeText } from "./validators.js";
@@ -9,7 +7,7 @@ import { loadSeed } from "./storage.js";
 const el = (sel) => document.querySelector(sel);
 
 export function initUI() {
-  // Nav toggle logic (added)
+  // --- NAVIGATION ---
   const navToggle = el("#nav-toggle");
   const mainNav = el("#main-nav");
 
@@ -18,12 +16,11 @@ export function initUI() {
     mainNav.removeAttribute("hidden");
     navToggle?.setAttribute("aria-expanded", "true");
     navToggle?.setAttribute("aria-label", "Close main navigation");
-    // trap focus on nav for small screens (basic)
-    // put focus on first nav button
     const firstBtn = mainNav.querySelector("button");
     if (firstBtn) firstBtn.focus();
-    document.body.style.overflow = "hidden"; // prevent background scroll (small screens)
+    document.body.style.overflow = "hidden";
   }
+
   function closeNav() {
     if (!mainNav) return;
     mainNav.setAttribute("hidden", "");
@@ -32,59 +29,38 @@ export function initUI() {
     document.body.style.overflow = "";
     navToggle?.focus();
   }
+
   if (navToggle && mainNav) {
     navToggle.addEventListener("click", () => {
       const expanded = navToggle.getAttribute("aria-expanded") === "true";
-      if (expanded) closeNav(); else openNav();
+      expanded ? closeNav() : openNav();
     });
 
-    // close nav on Escape
     document.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape") {
-        const expanded = navToggle.getAttribute("aria-expanded") === "true";
-        if (expanded) closeNav();
-      }
+      if (ev.key === "Escape" && navToggle.getAttribute("aria-expanded") === "true") closeNav();
     });
 
-    // close nav when clicking a nav item (and scroll)
     mainNav.addEventListener("click", (ev) => {
       const btn = ev.target.closest("button");
       if (!btn) return;
       const sel = btn.dataset.nav;
       if (sel) {
         const tgt = document.querySelector(sel);
-        if (tgt) {
-          tgt.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        if (tgt) tgt.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-      // For small screens close menu after navigation
-      const isSmall = window.matchMedia("(max-width: 47.99rem)").matches;
-      if (isSmall) closeNav();
+      if (window.matchMedia("(max-width: 47.99rem)").matches) closeNav();
     });
 
-    // If user resizes to desktop, ensure nav visible and attributes reset
     window.addEventListener("resize", () => {
-      if (window.matchMedia("(min-width: 48rem)").matches) {
-        mainNav.removeAttribute("hidden");
-        navToggle?.setAttribute("aria-expanded", "false");
-      } else {
-        // on smaller screens, hide nav by default
-        mainNav.setAttribute("hidden", "");
-      }
+      if (window.matchMedia("(min-width: 48rem)").matches) mainNav.removeAttribute("hidden");
+      else mainNav.setAttribute("hidden", "");
     });
 
-    // initialize nav visibility depending on screen size
-    if (window.matchMedia("(min-width: 48rem)").matches) {
-      mainNav.removeAttribute("hidden");
-      navToggle?.setAttribute("aria-expanded", "false");
-    } else {
-      mainNav.setAttribute("hidden", "");
-      navToggle?.setAttribute("aria-expanded", "false");
-    }
+    if (window.matchMedia("(min-width: 48rem)").matches) mainNav.removeAttribute("hidden");
+    else mainNav.setAttribute("hidden", "");
   }
 
-  // --- existing UI code (preserved) ---
-  // DOM refs
+  // --- DOM ELEMENTS ---
   const totalBooks = el("#total-books");
   const totalPages = el("#total-pages");
   const topTags = el("#top-tags");
@@ -94,9 +70,7 @@ export function initUI() {
   const searchInput = el("#regex-search");
   const caseIns = el("#case-ins");
   const sortBy = el("#sort-by");
-  const status = el("#status");
 
-  // Form refs
   const form = el("#record-form");
   const idField = el("#record-id");
   const titleF = el("#title");
@@ -105,10 +79,9 @@ export function initUI() {
   const tagF = el("#tag");
   const statusF = el("#status");
   const dateF = el("#dateAdded");
-
   const formErrors = el("#form-errors");
 
-  // Settings refs
+  // Settings elements
   const goalInput = el("#goal");
   const unitSelect = el("#unit");
   const exportBtn = el("#export-btn");
@@ -116,43 +89,36 @@ export function initUI() {
   const importFile = el("#import-file");
   const seedBtn = el("#seed-btn");
   const clearBtn = el("#clear-btn");
+  const statusEl = el("#status"); // aria status element for announcements
 
-  // helpers
-  function announce(msg, polite = true){
-    if(!status) return;
-    status.textContent = msg;
-    status.setAttribute("aria-live", polite ? "polite" : "assertive");
-  }
+  // --- HELPERS ---
+  const announce = (msg, polite = true) => {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.setAttribute("aria-live", polite ? "polite" : "assertive");
+  };
 
-  // render functions
+  // --- DASHBOARD ---
   function renderDashboard() {
-    const pages = State.totalPages();                 // total pages across all records
-    const goal = Number(State.settings.goal) || 0;    // reading goal
-
-    // Update total book & page stats
+    const pages = State.totalPages();
+    const goal = Number(State.settings.goal) || 0;
     totalBooks.textContent = State.records.length;
     totalPages.textContent = pages;
 
-    // Update top tags
     const tags = State.topTags();
     topTags.innerHTML = tags.length
       ? tags.map(t => `<li>${escapeHtml(t.tag)} (${t.count})</li>`).join("")
       : "<li>—</li>";
 
-    // === NEW: Calculate pages read (only for books with status 'done') ===
-    const pagesRead = State.records.reduce((acc, rec) => {
-      const p = Number(rec.pages) || 0;
-      return rec.status === "done" ? acc + p : acc;
-    }, 0);
+    const pagesRead = State.records.reduce((acc, rec) => rec.status === "done" ? acc + Number(rec.pages || 0) : acc, 0);
+    readingGoal.textContent = goal > 0 ? `${pagesRead} / ${goal} pages` : `${pagesRead} pages read`;
 
-    // === Update reading goal text ===
-    readingGoal.textContent = goal > 0
-      ? `${pagesRead} / ${goal} pages`
-      : `${pagesRead} pages read`;
-
-    // === Goal comparison message (based on pages read, not total pages) ===
     if (goal > 0) {
       const diff = pagesRead - goal;
+      const progressEl = document.getElementById("reading-progress");
+      const percent = Math.min(100, Math.round((pagesRead / goal) * 100));
+      if (progressEl) progressEl.style.width = `${percent}%`;
+
       if (diff < 0) {
         capMsg.textContent = `Under goal — ${-diff} pages remaining.`;
         capMsg.style.color = "#065f46";
@@ -168,109 +134,98 @@ export function initUI() {
       }
     } else {
       capMsg.textContent = "";
-    }
-
-    // === Optional: Progress bar update if present ===
-    const progressEl = document.getElementById("reading-progress");
-    if (progressEl && goal > 0) {
-      const pct = Math.min(100, Math.round((pagesRead / goal) * 100));
-      progressEl.style.width = `${pct}%`;
-    } else if (progressEl) {
-      progressEl.style.width = "0%";
+      const progressEl = document.getElementById("reading-progress");
+      if (progressEl) progressEl.style.width = "0%";
     }
   }
 
-  function getSortedFilteredRecords(){
-    let out = State.records.slice();
+  // --- RECORDS ---
+  function getSortedFilteredRecords() {
+    let out = [...State.records];
     const q = searchInput.value.trim();
     const re = q ? compileRegex(q, caseIns.checked ? "i" : "") : null;
 
-    if (q && !re) {
-      announce("Invalid regular expression — search ignored.", true);
-    } else if (re){
-      out = out.filter(r => re.test(`${r.title} ${r.author} ${r.tag}`));
-    }
+    if (q && !re) announce("Invalid regex — search ignored.", false);
+    else if (re) out = out.filter(r => re.test(`${r.title} ${r.author} ${r.tag}`));
 
     const sorts = {
-      date_desc: (a,b) => new Date(b.dateAdded) - new Date(a.dateAdded),
-      date_asc: (a,b) => new Date(a.dateAdded) - new Date(b.dateAdded),
-      title_asc: (a,b) => a.title.localeCompare(b.title),
-      title_desc: (a,b) => b.title.localeCompare(a.title),
-      pages_asc: (a,b) => (Number(a.pages)||0) - (Number(b.pages)||0),
-      pages_desc: (a,b) => (Number(b.pages)||0) - (Number(a.pages)||0)
+      date_desc: (a, b) => new Date(b.dateAdded) - new Date(a.dateAdded),
+      date_asc: (a, b) => new Date(a.dateAdded) - new Date(b.dateAdded),
+      title_asc: (a, b) => a.title.localeCompare(b.title),
+      title_desc: (a, b) => b.title.localeCompare(a.title),
+      pages_asc: (a, b) => (Number(a.pages) || 0) - (Number(b.pages) || 0),
+      pages_desc: (a, b) => (Number(b.pages) || 0) - (Number(a.pages) || 0)
     };
 
-    const sortFn = sorts[sortBy.value] || sorts.date_desc;
-    out.sort(sortFn);
+    out.sort(sorts[sortBy.value] || sorts.date_desc);
     return { out, re };
   }
 
-  function renderRecords(){
+  function renderRecords() {
     const { out, re } = getSortedFilteredRecords();
-
-    if (!out.length){
+    if (!out.length) {
       recordsBody.innerHTML = `<tr><td colspan="7" class="empty">No records found.</td></tr>`;
       return;
     }
 
     recordsBody.innerHTML = out.map(r => {
-      const highlight = (text) => re ? highlightMatches(text || "", re) : escapeHtml(text || "");
-      return `<tr data-id="${r.id}">
+      const highlight = (txt) => re ? highlightMatches(txt || "", re) : escapeHtml(txt || "");
+      return `<tr data-id="${escapeHtml(r.id)}">
         <td>${highlight(r.title)}</td>
         <td>${highlight(r.author)}</td>
-        <td>${escapeHtml(String(r.pages||0))}</td>
+        <td>${escapeHtml(String(r.pages || 0))}</td>
         <td>${highlight(r.tag)}</td>
-        <td><span class="status-${r.status}">${escapeHtml(r.status || 'unread')}</span></td>
+        <td><span class="status-${escapeHtml(r.status || 'unread')}">${escapeHtml(r.status || 'unread')}</span></td>
         <td>${escapeHtml(r.dateAdded)}</td>
         <td>
-          <button class="edit" data-id="${r.id}">Edit</button>
-          <button class="del" data-id="${r.id}">Delete</button>
+          <button class="edit" data-id="${escapeHtml(r.id)}">Edit</button>
+          <button class="del" data-id="${escapeHtml(r.id)}">Delete</button>
         </td>
       </tr>`;
     }).join("");
 
-    // Delegate click events for edit/delete
-    recordsBody.addEventListener("click", (e) => {
-      const btn = e.target;
+    recordsBody.onclick = (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
       const id = btn.dataset.id;
       if (!id) return;
 
       if (btn.classList.contains("del")) {
         if (confirm("Delete this record?")) {
           State.remove(id);
-          announce("Record deleted.", true);
+          announce("Record deleted.");
         }
       } else if (btn.classList.contains("edit")) {
         const rec = State.records.find(r => r.id === id);
-        if (rec) {
-          fillForm(rec);
-          idField.value = rec.id;
-          titleF.focus();
-        }
+        if (rec) fillForm(rec);
       }
-    });
+    };
   }
 
-  function fillForm(rec){
+  function fillForm(rec) {
     idField.value = rec.id || "";
     titleF.value = rec.title || "";
     authorF.value = rec.author || "";
     pagesF.value = rec.pages || "";
     tagF.value = rec.tag || "";
     statusF.value = rec.status || "unread";
-    dateF.value = rec.dateAdded || new Date().toISOString().slice(0,10);
+    dateF.value = rec.dateAdded || new Date().toISOString().slice(0, 10);
     formErrors.textContent = "";
+    titleF.focus();
   }
 
   const resetForm = () => {
     idField.value = "";
     formErrors.textContent = "";
-    dateF.value = new Date().toISOString().slice(0,10);
+    dateF.value = new Date().toISOString().slice(0, 10);
   };
+  form.addEventListener("reset", (ev) => {
+    ev.preventDefault(); // keep controlled reset to ensure defaults
+    form.reset();
+    resetForm();
+  });
 
-  form.addEventListener("reset", resetForm);
-
-  form.addEventListener("submit", (ev) => {
+  form.addEventListener("submit", ev => {
     ev.preventDefault();
     const id = idField.value || null;
     const payload = {
@@ -281,65 +236,60 @@ export function initUI() {
       status: statusF.value || "unread",
       dateAdded: dateF.value
     };
-
     const errs = validateRecord(payload);
-    if (errs.length){
-      formErrors.textContent = errs.join(" • ");
-      formErrors.focus();
-      return;
-    }
-
+    if (errs.length) { formErrors.textContent = errs.join(" • "); formErrors.focus(); return; }
     payload.pages = Number(payload.pages);
-
-    if (id) {
-      State.update(id, payload);
-      announce("Record updated.");
-    } else {
-      State.add(payload);
-      announce("Record added.");
-    }
-
+    if (id) State.update(id, payload);
+    else State.add(payload);
     form.reset();
     resetForm();
+    announce(id ? "Record updated." : "Record added.");
   });
 
-  goalInput.value = State.settings.goal || "";
-  unitSelect.value = State.settings.unit || "pages";
-
-  const saveSettings = () => announce("Settings saved.");
+  // --- SETTINGS ---
+  function updateSettingsUI() {
+    goalInput.value = State.settings.goal || "";
+    unitSelect.value = State.settings.unit || "pages";
+  }
 
   goalInput.addEventListener("change", () => {
     State.setSettings({ goal: Number(goalInput.value) || 0 });
-    saveSettings();
+    updateSettingsUI();
+    announce("Settings saved.");
   });
+
   unitSelect.addEventListener("change", () => {
     State.setSettings({ unit: unitSelect.value });
-    saveSettings();
+    updateSettingsUI();
+    announce("Settings saved.");
   });
 
-  [searchInput, caseIns, sortBy].forEach(el =>
-    el.addEventListener(el === searchInput ? "input" : "change", renderRecords)
+  // --- SEARCH & SORT ---
+  [searchInput, caseIns, sortBy].forEach(elm =>
+    elm.addEventListener(elm === searchInput ? "input" : "change", renderRecords)
   );
 
-  // export/import
+  // --- EXPORT / IMPORT ---
   exportBtn.addEventListener("click", () => {
-    const data = State.exportJSON();
-    const blob = new Blob([data], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([State.exportJSON()], { type: "application/json" });
     const a = document.createElement("a");
-    a.href = url; a.download = "book-notes-vault.json"; a.click();
-    URL.revokeObjectURL(url);
+    a.href = URL.createObjectURL(blob);
+    a.download = "book-notes-vault.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
     announce("Export started.");
   });
 
   importBtn.addEventListener("click", () => importFile.click());
   importFile.addEventListener("change", (ev) => {
     const f = ev.target.files[0];
-    if(!f) return;
+    if (!f) return;
     const r = new FileReader();
     r.onload = () => {
-      const ok = State.importJSON(r.result);
-      if(ok){ announce("Import successful."); } else { announce("Import failed — invalid file.", false); }
+      if (State.importJSON(r.result)) announce("Import successful.");
+      else announce("Import failed — invalid file.", false);
     };
     r.readAsText(f);
     importFile.value = "";
@@ -347,68 +297,34 @@ export function initUI() {
 
   seedBtn.addEventListener("click", async () => {
     const seed = await loadSeed();
-    if(Array.isArray(seed) && seed.length){
-      // ensure seeded items have required fields
+    if (Array.isArray(seed) && seed.length) {
       const now = new Date().toISOString();
-      const normalized = seed.map(s => Object.assign({}, s, { id: s.id || undefined, createdAt: s.createdAt || now, updatedAt: s.updatedAt || now }));
+      const normalized = seed.map(s => ({ ...s, id: s.id || undefined, createdAt: s.createdAt || now, updatedAt: s.updatedAt || now }));
       State.setRecords(normalized);
       announce("Seed loaded.");
-    } else {
-      announce("Seed load failed.", false);
-    }
+    } else announce("Seed load failed.", false);
   });
 
   clearBtn.addEventListener("click", () => {
-    if(!confirm("Clear all app data (records & settings)?")) return;
+    if (!confirm("Clear all app data (records & settings)?")) return;
     State.clearAll();
+    updateSettingsUI();
     announce("All data cleared.");
   });
 
-  // react to state changes
+  // --- REACT TO STATE ---
   State.subscribe(() => {
     renderDashboard();
     renderRecords();
+    updateSettingsUI();
   });
 
-  dateF.value = dateF.value || new Date().toISOString().slice(0,10);
+  // initial values
+  dateF.value = dateF.value || new Date().toISOString().slice(0, 10);
   renderDashboard();
   renderRecords();
-
-  // keyboard accessibility: allow Enter to activate nav buttons (kept)
-  document.querySelectorAll(".main-nav button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const sel = btn.dataset.nav;
-      const tgt = document.querySelector(sel);
-      if(tgt) tgt.scrollIntoView({behavior:"smooth", block:"start"});
-    });
-  });
+  updateSettingsUI();
 }
 
-// Automatically initialize if this module is the entrypoint
-if (document.readyState === "complete" || document.readyState === "interactive") {
-  // Delay slightly to ensure the other modules (State) attach; safe-guard if State not yet defined
-  setTimeout(() => {
-    if (typeof State !== "undefined") {
-      initUI();
-    } else {
-      // if State is not defined yet, try again shortly
-      const tries = 6;
-      let i = 0;
-      const t = setInterval(() => {
-        i++;
-        if (typeof State !== "undefined") {
-          clearInterval(t);
-          initUI();
-        } else if (i >= tries) {
-          clearInterval(t);
-          // no-op: State module missing — developer should ensure state.js is present
-          console.warn("initUI: State module not available after retries.");
-        }
-      }, 120);
-    }
-  }, 8);
-} else {
-  window.addEventListener("DOMContentLoaded", () => initUI());
-}
-
+// Do NOT auto-init here. main.js handles initialization.
 export default { initUI };

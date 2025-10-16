@@ -1,43 +1,81 @@
-// scripts/validators.js
+// scripts/search.js
+// Utilities for compiling regex, escaping HTML and highlighting matches.
 
-// Regex patterns
-export const PATTERNS = {
-  // Title: forbid leading/trailing spaces and require at least one non-space
-  title: /^\S(?:.*\S)?$/,
-  // Numeric pages: integer or decimal with up to 2 decimals (but pages are integers typically) - pattern from spec
-  numeric: /^(0|[1-9]\d*)(\.\d{1,2})?$/,
-  // Date YYYY-MM-DD
-  date: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
-  // Tag/category: letters, spaces, hyphens
-  tag: /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/,
-  // Advanced: duplicate-word detection (back-reference)
-  duplicateWord: /\b(\w+)\s+\1\b/i
-};
-
-// sanitize and collapse multiple spaces inside text and trim
-export function normalizeText(s){
-  return String(s || "").replace(/\s{2,}/g, " ").trim();
+/**
+ * Escape text to use safely in RegExp as literal
+ */
+export function escapeRegExp(s = "") {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function validateRecord({ title, author, pages, tag, status, dateAdded }){
-  const errs = [];
+/**
+ * Escape HTML to avoid XSS in inserted text
+ */
+export function escapeHtml(s = "") {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
-  // Title: no leading/trailing spaces
-  if(!PATTERNS.title.test(title)) errs.push("Title must not have leading/trailing spaces.");
-  // Author: allow empty or valid tag-like names (letters, spaces, hyphens)
-  if(author && !PATTERNS.tag.test(author)) errs.push("Author contains invalid characters.");
-  // Pages: must be integer >=1 (we'll use numeric regex + additional check)
-  if(!PATTERNS.numeric.test(String(pages))) errs.push("Pages must be a positive number (max 2 decimals).");
-  if(Number(pages) < 1) errs.push("Pages must be at least 1.");
-  // Tag
-  if(!PATTERNS.tag.test(tag)) errs.push("Tag must contain only letters, spaces, or hyphens.");
-  // Status: must be one of the valid options
-  if(!['unread', 'reading', 'done'].includes(status)) errs.push("Status must be unread, reading, or done.");
-  // Date
-  if(!PATTERNS.date.test(dateAdded)) errs.push("Date must be in YYYY-MM-DD format.");
+/**
+ * Compile a query string into a RegExp.
+ * Accepts either:
+ *   - /pattern/flags  (e.g. /foo/i)
+ *   - plain text -> treated as literal substring search
+ * Returns RegExp or null on invalid input.
+ */
+export function compileRegex(query, extraFlags = "") {
+  if (!query || typeof query !== "string") return null;
+  query = query.trim();
+  try {
+    // If user provided /pattern/flags syntax
+    if (query.startsWith("/") && query.lastIndexOf("/") > 0) {
+      const lastSlash = query.lastIndexOf("/");
+      const pattern = query.slice(1, lastSlash);
+      // flags provided by pattern plus any extra flags passed in
+      const providedFlags = query.slice(lastSlash + 1);
+      const flagsSet = Array.from(new Set((providedFlags + extraFlags).split("").filter(Boolean))).join("");
+      return new RegExp(pattern, flagsSet);
+    }
+    // Otherwise treat as literal substring
+    const flags = extraFlags || "i";
+    return new RegExp(escapeRegExp(query), flags);
+  } catch (e) {
+    // invalid regex
+    console.warn("Invalid regex:", e);
+    return null;
+  }
+}
 
-  // Advanced: avoid duplicate words in title
-  if(PATTERNS.duplicateWord.test(title)) errs.push("Title should not contain the same word twice in a row.");
-
-  return errs;
+/**
+ * Highlight matches inside text using <mark>. Returns safe HTML string.
+ * Uses escapeHtml for text safety.
+ */
+export function highlightMatches(text = "", re) {
+  if (!re) return escapeHtml(text);
+  // Ensure we can iterate matches, create a global regex to find all matches
+  let flags = re.flags.includes("g") ? re.flags : re.flags + "g";
+  let g = null;
+  try {
+    g = new RegExp(re.source, flags);
+  } catch (e) {
+    return escapeHtml(text);
+  }
+  let lastIndex = 0;
+  let out = "";
+  let m;
+  while ((m = g.exec(text)) !== null) {
+    const before = text.slice(lastIndex, m.index);
+    out += escapeHtml(before);
+    const matched = m[0];
+    out += `<mark>${escapeHtml(matched)}</mark>`;
+    lastIndex = g.lastIndex;
+    // avoid infinite loops for zero-length matches
+    if (m.index === g.lastIndex) g.lastIndex++;
+  }
+  out += escapeHtml(text.slice(lastIndex));
+  return out;
 }

@@ -228,6 +228,10 @@
   .status-reading{ color:#0b5394; background:#e6f0ff; padding:4px 8px; border-radius:6px; }
   .status-done{ color:#065f46; background:#ecfdf5; padding:4px 8px; border-radius:6px; }
   
+  /* Progress bar (reading goal) */
+  .progress-wrap{ width:100%; height:8px; background:#eef2f7; border-radius:999px; margin-top:8px; overflow:hidden; }
+  .reading-progress{ height:100%; background:linear-gradient(90deg,#34d399,#2563eb); transition:width .3s ease; }
+  
   /* Breakpoints */
   /* Tablet / medium screens */
   @media (min-width: 48rem) { /* ~768px */
@@ -270,4 +274,3 @@
     .controls{ gap:12px; }
     .site-header{ padding:20px; }
   }
-  
