@@ -8,5 +8,5 @@
   {"id":"rec_a7","title":"A Tale of Two Cities","author":"Charles Dickens","pages":544,"tag":"Novel","status":"reading","dateAdded":"2025-09-12","createdAt":"2025-09-12T08:00:00Z","updatedAt":"2025-09-12T08:00:00Z"},
   {"id":"rec_a8","title":"Mathematics for Machine Learning","author":"M. Deisenroth","pages":400,"tag":"Textbook","status":"unread","dateAdded":"2025-09-22","createdAt":"2025-09-22T09:00:00Z","updatedAt":"2025-09-22T09:00:00Z"},
   {"id":"rec_a9","title":"Study Notes — Linear Algebra","author":"I. Student","pages":45,"tag":"Notes","status":"done","dateAdded":"2025-10-09","createdAt":"2025-10-09T12:00:00Z","updatedAt":"2025-10-09T12:00:00Z"},
-  {"id":"rec_a10","title":"Coffee Coffee","author":"Repeat Author","pages":12,"tag":"Misc","status":"unread","dateAdded":"2025-10-10","createdAt":"2025-10-10T07:00:00Z","updatedAt":"2025-10-10T07:00:00Z"}
+  {"id":"rec_a10","title":"Coffee","author":"Repeat Author","pages":12,"tag":"Misc","status":"unread","dateAdded":"2025-10-10","createdAt":"2025-10-10T07:00:00Z","updatedAt":"2025-10-10T07:00:00Z"}
 ]
