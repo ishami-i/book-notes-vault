@@ -54,8 +54,17 @@ It stores your data locally (using `localStorage`), so your notes remain private
 
 ## 🚀 Getting Started
 
-### 1️⃣ Clone the Repository
+First, Clone the Repository
 
 ```bash
 git clone https://github.com/ishami-i/book-notes-vault.git
 cd book-notes-vault
+```
+Then, run the app based on your text editor
+
+## LICENCE
+
+This project is licensed under the MIT License.
+
+## 👤 Author
+Ishami Irené
