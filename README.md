@@ -11,10 +11,13 @@ No frameworks, no backend, just fast and portable code that runs right in your b
 It stores your data locally (using `localStorage`), so your notes remain private, persistent, and offline-ready.
 
 ---
+## deployed link
+here, it's the link to the website https://ishami-i.github.io/book-notes-vault/
 
+---
 ## 🖼️ Live Demo
 
-how to use repo after runing it on local is like this https://youtu.be/TxmEhCZrgUY
+How to use repo after running it on local is like this https://youtu.be/TxmEhCZrgUY
 
 
 ---
