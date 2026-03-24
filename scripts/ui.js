@@ -7,6 +7,26 @@ import { loadSeed } from "./storage.js";
 const el = (sel) => document.querySelector(sel);
 
 export function initUI() {
+  // --- THEME TOGGLE ---
+  const themeToggle = el("#theme-toggle");
+  const themeIcon = themeToggle?.querySelector(".theme-icon");
+  const htmlEl = document.documentElement;
+
+  function applyTheme(theme) {
+    htmlEl.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    if (themeIcon) themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
+    if (themeToggle) themeToggle.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  }
+
+  const savedTheme = localStorage.getItem("theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(savedTheme);
+
+  themeToggle?.addEventListener("click", () => {
+    applyTheme(htmlEl.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+
   // --- NAVIGATION ---
   const navToggle = el("#nav-toggle");
   const mainNav = el("#main-nav");
